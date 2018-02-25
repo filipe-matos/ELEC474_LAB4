@@ -13,6 +13,7 @@ using namespace std;
 void addToDataSet(Mat &data, vector<string> &labels, Mat &newData, vector<string> &newLabels);
 Mat norm_0_255(Mat src);
 string recognizeFace(Mat query, Mat samples, vector<string> labels);
+Mat detectFace(const Mat &image, CascadeClassifier &faceDetector);
 
 int main()
 {    
@@ -21,32 +22,42 @@ int main()
 	
 	// Perform PCA
 	// cv::PCA pca(....);
+
+	Mat face;
+	Mat samples;
+
+	face = detectFace(image, faceDetector);
+	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
 	
+	
+
 	// Visualize Mean
-    Mat meanFace = pca.mean;
-    // normalize and reshape mean
-    imshow("meanFace", meanFace);
-    waitKey();
-    
-    // Visualize Eigenfaces
-    for(unsigned int i = 0; i < pca.eigenvectors.rows; i++)
-    {
-        Mat eigenface;
-        eigenface = pca.eigenvectors.row(i).clone();
-        // normalize and reshape eigenface
-        //applyColorMap(eigenface, eigenface, COLORMAP_JET);
-        
-        imshow(format("eigenface_%d", i), eigenface);
-        waitKey();
-    }
-    
-    // Project all samples into the Eigenspace
-    // code..
-    
+    	Mat meanFace = pca.mean;
+
+	// normalize and reshape mean
+	imshow("meanFace", meanFace);
+	waitKey();
+
+	// Visualize Eigenfaces
+	for(unsigned int i = 0; i < pca.eigenvectors.rows; i++)
+	{
+	Mat eigenface;
+	eigenface = pca.eigenvectors.row(i).clone();
+	// normalize and reshape eigenface
+	//applyColorMap(eigenface, eigenface, COLORMAP_JET);
+
+	imshow(format("eigenface_%d", i), eigenface);
+	waitKey();
+	}
+
+	// Project all samples into the Eigenspace
+	// code..
+
 	// ID Faces
 	// code..
 	   
-    return 0;
+	return 0;
 }
 
 void addToDataSet(Mat &samples, vector<string> &labels, Mat &newSamples, vector<string> &newLabels)
@@ -65,5 +76,6 @@ string recognizeFace(Mat query, Mat samples, vector<string> labels)
     // given a query sample find the training sample it is closest to and return the proper label
     // implement a nearest neighbor algorithm to achieve this
 }
+
 
 

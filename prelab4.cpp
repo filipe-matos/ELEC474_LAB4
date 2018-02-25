@@ -5,9 +5,47 @@ int main ()
 {
 	Mat face;
 	Mat samples;
-	
-	face = detectFace(image, faceDetector);
+	vector<string> labels;
+
+	// Load Ronaldo's Face
+	Mat ronaldo("Images/ronaldo.jpg");
+	face = detectFace(ronaldo, faceDetector);
 	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
+	labels.push_back("Ronaldo");
+	
+	// Load Messi's Face
+	Mat messi("Images/messi.jpg");
+	face = detectFace(ronaldo, faceDetector);
+	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
+	labels.push_back("Messi");
+	
+	// Load Wilshere's Face
+	Mat wilshere("Images/wilshere.jpg");
+	face = detectFace(wilshere, faceDetector);
+	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
+	labels.push_back("Wilshere");
+
+	// Load Mustafi's Face
+	Mat mustafi("Images/mustafi.jpg");
+	face = detectFace(mustafi, faceDetector);
+	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
+	labels.push_back("Mustafi");
+
+
+	// Load Salah's Face
+	Mat salah("Images/salah.jpg");
+	face = detectFace(salah, faceDetector);
+	resizeFace(face);
+	samples.push_back(face.clone().reshape(1,1));
+	labels.push_back("Salah");
+
+	
+
+
 	samples.push_back(face.clone().reshape(1,1));
 
 }
