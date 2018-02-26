@@ -9,11 +9,16 @@
 #include <string>
 #include <vector>
 
+// g++ -std=c++11 removeRedEyes.cpp `pkg-config --libs --cflags opencv` -o removeRedEyes
+
+// ./removeRedEyes
+
 using namespace cv;
 using namespace std;
 
 void resizeFace(Mat &face);
 Mat detectFace(const Mat &image, CascadeClassifier &faceDetector);
+void combineDataSets(const string& file1, const string& file2, const string& writeFile);
 
 int main ()
 {
@@ -23,7 +28,7 @@ int main ()
 	CascadeClassifier faceDetector;
 
 	// Load Ronaldo's Face
-	Mat ronaldo = imread("Images/ronaldo.jpg");
+	Mat ronaldo = imread("Images/ronaldo.jpg", IMREAD_GRAYSCALE);
 	imshow("Ronaldo", ronaldo);
 	waitKey();
 	face = detectFace(ronaldo, faceDetector); // get face sub-image
@@ -32,11 +37,9 @@ int main ()
 	waitKey();
 	samples.push_back(face.clone().reshape(1,1)); // Reshape matrix into row vector
 	labels.push_back("Ronaldo");
-
-	cout << face.rows << " : " << face.cols << endl;
 	
 	// Load Messi's Face
-	Mat messi = imread("Images/messi.jpg");
+	Mat messi = imread("Images/messi.jpg", IMREAD_GRAYSCALE);
 	imshow("Messi", messi);
 	waitKey();
 	face = detectFace(messi, faceDetector);
@@ -45,11 +48,9 @@ int main ()
 	waitKey();
 	samples.push_back(face.clone().reshape(1,1));
 	labels.push_back("Messi");
-
-	cout << face.rows << " : " << face.cols << endl;
 	
 	// Load Wilshere's Face
-	Mat wilshere = imread("Images/wilshere.jpg");
+	Mat wilshere = imread("Images/wilshere.jpg", IMREAD_GRAYSCALE);
 	imshow("Wilshere", wilshere);
 	waitKey();
 	face = detectFace(wilshere, faceDetector);
@@ -59,10 +60,8 @@ int main ()
 	samples.push_back(face.clone().reshape(1,1));
 	labels.push_back("Wilshere");
 
-	cout << face.rows << " : " << face.cols << endl;
-
 	// Load Mustafi's Face
-	Mat mustafi = imread("Images/mustafi.jpg");
+	Mat mustafi = imread("Images/mustafi.jpg", IMREAD_GRAYSCALE);
 	imshow("Mustafi", mustafi);
 	waitKey();
 	face = detectFace(mustafi, faceDetector);
@@ -71,12 +70,9 @@ int main ()
 	waitKey();
 	samples.push_back(face.clone().reshape(1,1));
 	labels.push_back("Mustafi");
-	
-	cout << face.rows << " : " << face.cols << endl;
-
 
 	// Load Salah's Face
-	Mat salah = imread("Images/salah.jpg");
+	Mat salah = imread("Images/salah.jpg", IMREAD_GRAYSCALE);
 	imshow("Salah", salah);
 	waitKey();
 	face = detectFace(salah, faceDetector);
@@ -86,9 +82,21 @@ int main ()
 	samples.push_back(face.clone().reshape(1,1));
 	labels.push_back("Salah");
 
+	// cout << samples.rows << " : " << samples.cols << endl;
+
+	// Save Data to .xml file
+
+	FileStorage fs; // Create filestorage instance
 	
-	cout << face.rows << " : " << face.cols << endl;
-	cout << samples.rows << " : " << samples.cols << endl;
+	fs.open("10090379.xml", FileStorage::WRITE); // Filename is student number
+
+	fs << "samples" << samples;
+	fs << "labels" << labels;
+	fs.release();
+
+	// test combineDataSet function
+	
+	combineDataSets("10090379.xml", "10090379.xml", "combined.xml");
 
 }
 
@@ -101,7 +109,7 @@ Mat detectFace(const Mat &image, CascadeClassifier &faceDetector)
 {
 	vector<Rect> faces;
 	bool isok = faceDetector.load("/home/filipe/opencv/data/haarcascades/haarcascade_frontalface_default.xml");
-	cout << isok << endl;
+	// cout << isok << endl;
 
 	faceDetector.detectMultiScale(image, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30,30));
 
@@ -127,4 +135,33 @@ Mat detectFace(const Mat &image, CascadeClassifier &faceDetector)
 */
 
 	return image(faces[0]).clone();
+}
+
+void combineDataSets(const string& file1, const string& file2, const string& writeFile) {
+	
+	
+	FileStorage fs; // create FileStorage instance
+	Mat samples;
+	Mat samples_temp;
+	vector<string> labels;
+	vector<string> labels_temp;
+	
+	fs.open(file1, FileStorage::READ);
+	fs["samples"] >> samples;
+	fs["labels"] >> labels;
+	
+	fs.open(file2, FileStorage::READ);
+	fs["samples"] >> samples_temp;
+	fs["labels"] >> labels_temp;
+
+	samples.push_back(samples_temp); // combine two matrices
+
+	labels.insert(labels.end(), labels_temp.begin(), labels_temp.end()); //combine labels
+
+	fs.open(writeFile, FileStorage::WRITE);
+	fs << "samples" << samples;
+	fs << "labels" << labels;
+
+	fs.release();
+
 }
